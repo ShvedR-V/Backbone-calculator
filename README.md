@@ -4,7 +4,7 @@
 
 ### 1. Install bower
 
-    `npm install -g bower`
+`npm install -g bower`
 
 ### 2. Install dependencies
 

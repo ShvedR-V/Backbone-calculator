@@ -1,1 +1,1 @@
-console.log("start calculator")
+const calculator = new CalculatorModel({});
