@@ -89,3 +89,13 @@ const CalculatorModel = Backbone.Model.extend({
     }
   }
 });
+
+const ButtonModel = Backbone.Model.extend({
+  defaults: {
+    value: '',
+    class: ''
+  },
+  click: function() {
+    console.log(this.attributes.value)
+  }
+});
