@@ -6,6 +6,22 @@ const CalculatorModel = Backbone.Model.extend({
     result: ''
   },
 
+  isNumeric: function (value) {
+    return /^-?\d+$/.test(value);
+  },
+  isOperation: function (value) {
+    return /^[-+/*√=]$/.test(value);
+  },
+
+  getKey: function(value) {
+    if (this.isNumeric(value)){
+      this.setOperand(value);
+    }
+    if (this.isOperation(value)){
+      this.setOperation(value);
+    }
+  },
+
   calculateResult: function() {
     switch(this.attributes.operation) {
       case '+':
@@ -40,7 +56,7 @@ const CalculatorModel = Backbone.Model.extend({
           operation: ''
         })
         break
-      case 'sqrt':
+      case '√':
         this.attributes.result = parseFloat(this.attributes.val1) ** (0.5);
         this.set({
           val1: '',
@@ -54,6 +70,9 @@ const CalculatorModel = Backbone.Model.extend({
   setOperation: function(operation) {
     if (operation === '+/-') {
       this.changeSignOperation();
+    }
+    if (operation === '=') {
+      this.calculateResult();
     } else {
       this.attributes.operation = operation;
     }

@@ -16,7 +16,7 @@ const operationButtons = [
     buttonClass: 'operation-divide'
   },
   {
-    value: 'sqrt',
+    value: '√',
     buttonClass: 'operation-sqrt'
   },
   {
@@ -37,6 +37,10 @@ const CalculatorView = Backbone.View.extend({
   tagName: 'div',
   template: _.template($('#calculator-template').html()),
 
+  events: {
+    'click .btn': 'onClickButton'
+  },
+
   initialize: function() {
     this.render();
   },
@@ -44,7 +48,14 @@ const CalculatorView = Backbone.View.extend({
     this.$el.html(this.template());
     this.renderOperationalButtons();
     this.renderNumericButtons();
+    this.renderScreen();
+    this.listenTo(this.model, 'change', this.onModelChange);
     return this;
+  },
+
+  onModelChange: function() {
+    console.log('change')
+    // this.screen.attributes.result = this.model.get('result');
   },
 
   renderOperationalButtons: function() {
@@ -72,8 +83,34 @@ const CalculatorView = Backbone.View.extend({
       })
     });
     this.$(`.${params.buttonClass}`).append(button.el);
+  },
+
+  renderScreen: function(){
+    this.screen = new ScreenView({
+      model: this.model
+    })
+    this.$('.screen').append(this.screen.el);
+  },
+
+  onClickButton: function(event){
+    const value = $(event.currentTarget)[0].innerText;
+    this.model.getKey(value);
   }
 });
+
+
+const ScreenView = Backbone.View.extend({
+  template: _.template($('#screen-template').html()),
+
+  initialize: function() {
+    this.render();
+  },
+  render: function() {
+    this.$el.html(this.template(this.model.toJSON()));
+    return this;
+  }
+});
+
 
 const ButtonView = Backbone.View.extend({
   template: _.template($('#button-template').html()),
@@ -87,7 +124,4 @@ const ButtonView = Backbone.View.extend({
     this.$el.html(this.template(this.model.toJSON()));
     return this;
   },
-  click: function() {
-    console.log('clicked on ' + this.model.toJSON().value + ' button');
-  }
 });

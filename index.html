@@ -14,6 +14,7 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-6">
+          <div class="row gx-2 mt-2 screen"></div>
           <div class="row gx-2 mt-2">
             <div class="col number-7"></div>
             <div class="col number-8"></div>
@@ -48,6 +49,9 @@
     <button class=" col-12 btn btn-primary <%= buttonClass %>" >
       <%= value %>
     </button>
+  </script>
+  <script type="text/template" id="screen-template">
+    <div class="p-3 mb-2 bg-success text-white"><%= result %></div>
   </script>
   
   <script src="bower_components/jquery/dist/jquery.js"></script>
