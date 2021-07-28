@@ -76,7 +76,6 @@ const CalculatorView = Backbone.View.extend({
 });
 
 const ButtonView = Backbone.View.extend({
-  tagName: 'button',
   template: _.template($('#button-template').html()),
   events: {
     'click': 'click'
