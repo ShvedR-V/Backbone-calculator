@@ -22,6 +22,7 @@ const CalculatorModel = Backbone.Model.extend({
     operation: '',
     displayValue: '0',
     memoryValue: '0',
+    actions: []
   },
   cache: [],
 
@@ -36,7 +37,7 @@ const CalculatorModel = Backbone.Model.extend({
   },
 
   normalizeResult: function(result) {
-    return (Math.round(result * 1000000000000000) / 1000000000000000)
+    return (Math.round(result * 1000000000000000) / 1000000000000000).toString()
   },
 
   isNumeric: function (value) {
@@ -59,61 +60,83 @@ const CalculatorModel = Backbone.Model.extend({
     }
   },
 
+  addResultToActions: function(result) {
+    return [...this.attributes.actions, 
+      {
+        calculation: `${this.attributes.val1} ${this.attributes.operation} ${this.attributes.val2}`,
+        result
+      }
+    ]
+  },
+
   calculateResult: function() {
     let displayValue;
+    let actions;
     switch(this.attributes.operation) {
       case operations.OPERATION_ADD:
-        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) + parseFloat(this.attributes.val2)).toString());
+        displayValue = this.normalizeResult(parseFloat(this.attributes.val1) + parseFloat(this.attributes.val2));
+        actions = this.addResultToActions(displayValue),
         this.set({
           val1: displayValue,
           val2: '',
           operation: '',
-          displayValue
+          displayValue,
+          actions
         })
         break;
       case operations.OPERATION_SUBTRACT:
-        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) - parseFloat(this.attributes.val2)).toString());
+        displayValue = this.normalizeResult(parseFloat(this.attributes.val1) - parseFloat(this.attributes.val2));
+        actions = this.addResultToActions(displayValue),
         this.set({
           val1: displayValue,
           val2: '',
           operation: '',
-          displayValue
+          displayValue,
+          actions
         })
         break;
       case operations.OPERATION_MULTIPLY:
-        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) * parseFloat(this.attributes.val2)).toString());
+        displayValue = this.normalizeResult(parseFloat(this.attributes.val1) * parseFloat(this.attributes.val2));
+        actions = this.addResultToActions(displayValue),
         this.set({
           val1: displayValue,
           val2: '',
           operation: '',
-          displayValue
+          displayValue,
+          actions
         })
         break;
       case operations.OPERATION_DIVIDE:
-        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) / parseFloat(this.attributes.val2)).toString());
+        displayValue = this.normalizeResult(parseFloat(this.attributes.val1) / parseFloat(this.attributes.val2));
+        actions = this.addResultToActions(displayValue),
         this.set({
           val1: displayValue,
           val2: '',
           operation: '',
-          displayValue
+          displayValue,
+          actions
         })
         break;
       case operations.OPERATION_SQRT:
-        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) ** (0.5)).toString());
+        displayValue = this.normalizeResult(parseFloat(this.attributes.val1) ** (0.5));
+        actions = this.addResultToActions(displayValue),
         this.set({
           val1: displayValue,
           val2: '',
           operation: '',
-          displayValue
+          displayValue,
+          actions
         })
         break;
       case operations.OPERATION_PERCENT:
-        displayValue = this.normalizeResult((parseFloat(this.attributes.val2) *  parseFloat(this.attributes.val1) / 100).toString());
+        displayValue = this.normalizeResult(parseFloat(this.attributes.val2) *  parseFloat(this.attributes.val1) / 100);
+        actions = this.addResultToActions(displayValue),
         this.set({
           val1: displayValue,
           val2: '',
           operation: '',
-          displayValue
+          displayValue,
+          actions
         })
         break;
     }
@@ -121,7 +144,6 @@ const CalculatorModel = Backbone.Model.extend({
 
   setOperation: function(operation, symbol) {
     if (operation === operations.OPERATION_CHANGE_SIGN) {
-
       this.changeSignOperation();
       return;
     }
@@ -142,8 +164,13 @@ const CalculatorModel = Backbone.Model.extend({
       return;
     }
     if (operation === operations.OPERATION_SQRT) {
-      this.attributes.operation = operation;
-      this.calculateResult();
+      if (this.attributes.operation) {
+        this.calculateResult();
+        this.attributes.operation = operation;
+      } else {
+        this.attributes.operation = operation;
+        this.calculateResult();
+      }
       return;
     }
     if (operation === operations.OPERATION_DOT) {
@@ -158,7 +185,12 @@ const CalculatorModel = Backbone.Model.extend({
       this.calculateResult();
       return;
     } else {
-      this.attributes.operation = operation;
+      if (this.attributes.operation) {
+        this.calculateResult();
+        this.attributes.operation = operation;
+      } else {
+        this.attributes.operation = operation;
+      }
       this.set({
         displayValue: symbol
       });
