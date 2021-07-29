@@ -199,24 +199,58 @@ const CalculatorModel = Backbone.Model.extend({
   },
   addToMemory: function() {
     if (this.attributes.val2.length > 0) {
+      const memoryValue = parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val2)
       this.set({
-        memoryValue: parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val2)
+        memoryValue,
+        actions: [
+          ...this.attributes.actions, 
+          {
+            calculation: `Memory: ${this.attributes.memoryValue} + ${this.attributes.val2}`,
+            result: memoryValue
+          }
+        ]
       })
+
     } else {
+      const memoryValue = parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val1)
       this.set({
-        memoryValue: parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val1)
+        memoryValue,
+        actions: [
+          ...this.attributes.actions, 
+          {
+            calculation: `Memory: ${this.attributes.memoryValue} + ${this.attributes.val1}`,
+            result: memoryValue
+          }
+        ]
       })
     }
   },
 
   subtractFromMemory: function() {
     if (this.attributes.val2.length > 0) {
+      const  memoryValue = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val2)
       this.set({
-        memoryValue: parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val2)
+        memoryValue,
+        actions: [
+          ...this.attributes.actions, 
+          {
+            calculation: `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`,
+            result: memoryValue
+          }
+        ]
       })
+      
     } else {
+      const memoryValue  = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val1)
       this.set({
-        memoryValue: parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val1)
+        memoryValue,
+        actions: [
+          ...this.attributes.actions, 
+          {
+            calculation: `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`,
+            result: memoryValue
+          }
+        ]
       })
     }
   },
@@ -228,6 +262,13 @@ const CalculatorModel = Backbone.Model.extend({
       val2: '',
       operation: '',
       memoryValue: '0',
+      actions: [
+        ...this.attributes.actions, 
+        {
+          calculation: `Recalled from memory: ${this.attributes.memoryValue}`,
+          result: ''
+        }
+      ]
     })
   },
 
