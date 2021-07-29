@@ -1,3 +1,16 @@
+const operations = {
+  OPERATION_ADD: "add",
+  OPERATION_SUBTRACT: "subtract",
+  OPERATION_MULTIPLY: "multiply",
+  OPERATION_DIVIDE: "divide",
+  OPERATION_PERCENT: "percent",
+  OPERATION_DOT: "dot",
+  OPERATION_CHANGE_SIGN: "changeSign",
+  OPERATION_SQRT: "sqrt",
+  OPERATION_EQUALS: "equals",
+  OPERATION_ERASE: "erase",
+}
+
 const CalculatorModel = Backbone.Model.extend({
   defaults: {
     val1: '0',
@@ -10,25 +23,24 @@ const CalculatorModel = Backbone.Model.extend({
     return /^-?\d+$/.test(value);
   },
   isOperation: function (value) {
-    return /^[-+/*√.=C]$/.test(value);
+    return /^[-+/*√%.=C]$/.test(value);
   },
   includesDot: function (value) {
     return /\./g.test(value);
   },
 
-  getKey: function(value) {
-    if (this.isNumeric(value)){
-      this.setOperand(value);
-    }
-    if (this.isOperation(value)){
-      this.setOperation(value);
+  getKey: function(operation, symbol) {
+    if (this.isNumeric(operation)){
+      this.setOperand(operation);
+    } else {
+      this.setOperation(operation, symbol);
     }
   },
 
   calculateResult: function() {
     let displayValue;
     switch(this.attributes.operation) {
-      case '+':
+      case operations.OPERATION_ADD:
         displayValue = parseFloat(this.attributes.val1) + parseFloat(this.attributes.val2);
         this.set({
           val1: displayValue,
@@ -37,7 +49,7 @@ const CalculatorModel = Backbone.Model.extend({
           displayValue
         })
         break;
-      case '-':
+      case operations.OPERATION_SUBTRACT:
         displayValue = parseFloat(this.attributes.val1) - parseFloat(this.attributes.val2);
         this.set({
           val1: displayValue,
@@ -46,7 +58,7 @@ const CalculatorModel = Backbone.Model.extend({
           displayValue
         })
         break;
-      case '*':
+      case operations.OPERATION_MULTIPLY:
         displayValue = parseFloat(this.attributes.val1) * parseFloat(this.attributes.val2);
         this.set({
           val1: displayValue,
@@ -55,7 +67,7 @@ const CalculatorModel = Backbone.Model.extend({
           displayValue
         })
         break;
-      case '/':
+      case operations.OPERATION_DIVIDE:
         displayValue = parseFloat(this.attributes.val1) / parseFloat(this.attributes.val2);
         this.set({
           val1: displayValue,
@@ -64,8 +76,17 @@ const CalculatorModel = Backbone.Model.extend({
           displayValue
         })
         break;
-      case '√':
+      case operations.OPERATION_SQRT:
         displayValue = parseFloat(this.attributes.val1) ** (0.5);
+        this.set({
+          val1: displayValue,
+          val2: '',
+          operation: '',
+          displayValue
+        })
+        break;
+      case operations.OPERATION_PERCENT:
+        displayValue = parseFloat(this.attributes.val2) *  parseFloat(this.attributes.val1) / 100;
         this.set({
           val1: displayValue,
           val2: '',
@@ -76,34 +97,34 @@ const CalculatorModel = Backbone.Model.extend({
     }
   },
 
-  setOperation: function(operation) {
-    if (operation === '+/-') {
+  setOperation: function(operation, symbol) {
+    if (operation === operations.OPERATION_CHANGE_SIGN) {
       this.changeSignOperation();
       this.set({
         displayValue: this.attributes.val2
       });
       return;
     }
-    if (operation === '√') {
+    if (operation === operations.OPERATION_SQRT) {
       this.attributes.operation = operation;
       this.calculateResult();
       return;
     }
-    if (operation === '.') {
+    if (operation === operations.OPERATION_DOW) {
       this.addDotOperation();
       return;
     }
-    if (operation === 'C') {
+    if (operation === operations.OPERATION_ERASE) {
       this.eraseOperation();
       return;
     }
-    if (operation === '=') {
+    if (operation === operations.OPERATION_EQUALS) {
       this.calculateResult();
       return;
     } else {
       this.attributes.operation = operation;
       this.set({
-        displayValue: this.attributes.operation
+        displayValue: symbol
       });
     }
   },
