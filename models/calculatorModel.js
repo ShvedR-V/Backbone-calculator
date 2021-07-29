@@ -38,7 +38,8 @@ const CalculatorModel = Backbone.Model.extend({
   },
 
   normalizeResult: function(result) {
-    return (Math.round(result * 1000000000000000) / 1000000000000000).toString()
+    const normalizedResult = (Math.round(result * 1000000000000000) / 1000000000000000).toString()
+    return isNaN(normalizedResult) ? '0' : normalizedResult;
   },
 
   isNumeric: function (value) {
@@ -159,6 +160,9 @@ const CalculatorModel = Backbone.Model.extend({
       return;
     }
     if (operation === operations.OPERATION_EQUALS) {
+      if(this.attributes.operation === '' || this.attributes.val2 === '') {
+        return;
+      }
       this.calculateResult();
       return;
     } else {
@@ -252,6 +256,7 @@ const CalculatorModel = Backbone.Model.extend({
       val2: '',
       operation: '',
       displayValue: '0',
+      symbol: '',
     })
   },
 
