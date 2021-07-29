@@ -4,4 +4,4 @@ const calculatorView = new CalculatorView({
   model: calculator
 });
 
-$('#calculator-container').append(calculatorView.el)
+$('#calculator-container').append(calculatorView.el);

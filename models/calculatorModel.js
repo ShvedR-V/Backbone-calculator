@@ -20,6 +20,7 @@ const CalculatorModel = Backbone.Model.extend({
     val1: '0',
     val2: '',
     operation: '',
+    symbol: '',
     displayValue: '0',
     memoryValue: '0',
     actions: []
@@ -27,7 +28,7 @@ const CalculatorModel = Backbone.Model.extend({
   cache: [],
 
   addToCache: function() {
-    this.cache.push({...this.attributes})
+    this.cache.push({...this.attributes});
   },
 
   applyFromCache: function() {
@@ -61,9 +62,10 @@ const CalculatorModel = Backbone.Model.extend({
   },
 
   addResultToActions: function(result) {
-    return [...this.attributes.actions, 
+    return [
+      ...this.attributes.actions, 
       {
-        calculation: `${this.attributes.val1} ${this.attributes.operation} ${this.attributes.val2}`,
+        calculation: `${this.attributes.val1} ${this.attributes.symbol} ${this.attributes.val2}`,
         result
       }
     ]
@@ -164,6 +166,7 @@ const CalculatorModel = Backbone.Model.extend({
       return;
     }
     if (operation === operations.OPERATION_SQRT) {
+      this.attributes.symbol = symbol;
       if (this.attributes.operation) {
         this.calculateResult();
         this.attributes.operation = operation;
@@ -185,15 +188,13 @@ const CalculatorModel = Backbone.Model.extend({
       this.calculateResult();
       return;
     } else {
+      this.attributes.symbol = symbol;
       if (this.attributes.operation) {
         this.calculateResult();
         this.attributes.operation = operation;
       } else {
         this.attributes.operation = operation;
       }
-      this.set({
-        displayValue: symbol
-      });
     }
   },
   addToMemory: function() {
