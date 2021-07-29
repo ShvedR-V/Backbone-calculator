@@ -9,6 +9,9 @@ const operations = {
   OPERATION_SQRT: "sqrt",
   OPERATION_EQUALS: "equals",
   OPERATION_ERASE: "erase",
+  OPERATION_MEMORY_ADD: "memoryAdd",
+  OPERATION_MEMORY_SUBTRACT: "memorySubtract",
+  OPERATION_MEMORY_RECALL: "memoryRecall",
 }
 
 const CalculatorModel = Backbone.Model.extend({
@@ -16,7 +19,8 @@ const CalculatorModel = Backbone.Model.extend({
     val1: '0',
     val2: '',
     operation: '',
-    displayValue: '0'
+    displayValue: '0',
+    memoryValue: '0'
   },
 
   isNumeric: function (value) {
@@ -41,7 +45,7 @@ const CalculatorModel = Backbone.Model.extend({
     let displayValue;
     switch(this.attributes.operation) {
       case operations.OPERATION_ADD:
-        displayValue = parseFloat(this.attributes.val1) + parseFloat(this.attributes.val2);
+        displayValue = (parseFloat(this.attributes.val1) + parseFloat(this.attributes.val2)).toString();
         this.set({
           val1: displayValue,
           val2: '',
@@ -50,7 +54,7 @@ const CalculatorModel = Backbone.Model.extend({
         })
         break;
       case operations.OPERATION_SUBTRACT:
-        displayValue = parseFloat(this.attributes.val1) - parseFloat(this.attributes.val2);
+        displayValue = (parseFloat(this.attributes.val1) - parseFloat(this.attributes.val2)).toString();
         this.set({
           val1: displayValue,
           val2: '',
@@ -59,7 +63,7 @@ const CalculatorModel = Backbone.Model.extend({
         })
         break;
       case operations.OPERATION_MULTIPLY:
-        displayValue = parseFloat(this.attributes.val1) * parseFloat(this.attributes.val2);
+        displayValue = (parseFloat(this.attributes.val1) * parseFloat(this.attributes.val2)).toString();
         this.set({
           val1: displayValue,
           val2: '',
@@ -68,7 +72,7 @@ const CalculatorModel = Backbone.Model.extend({
         })
         break;
       case operations.OPERATION_DIVIDE:
-        displayValue = parseFloat(this.attributes.val1) / parseFloat(this.attributes.val2);
+        displayValue = (parseFloat(this.attributes.val1) / parseFloat(this.attributes.val2)).toString();
         this.set({
           val1: displayValue,
           val2: '',
@@ -77,7 +81,7 @@ const CalculatorModel = Backbone.Model.extend({
         })
         break;
       case operations.OPERATION_SQRT:
-        displayValue = parseFloat(this.attributes.val1) ** (0.5);
+        displayValue = (parseFloat(this.attributes.val1) ** (0.5)).toString();
         this.set({
           val1: displayValue,
           val2: '',
@@ -86,7 +90,7 @@ const CalculatorModel = Backbone.Model.extend({
         })
         break;
       case operations.OPERATION_PERCENT:
-        displayValue = parseFloat(this.attributes.val2) *  parseFloat(this.attributes.val1) / 100;
+        displayValue = (parseFloat(this.attributes.val2) *  parseFloat(this.attributes.val1) / 100).toString();
         this.set({
           val1: displayValue,
           val2: '',
@@ -99,10 +103,20 @@ const CalculatorModel = Backbone.Model.extend({
 
   setOperation: function(operation, symbol) {
     if (operation === operations.OPERATION_CHANGE_SIGN) {
+
       this.changeSignOperation();
-      this.set({
-        displayValue: this.attributes.val2
-      });
+      return;
+    }
+    if (operation === operations.OPERATION_MEMORY_ADD) {
+      this.addToMemory();
+      return;
+    }
+    if (operation === operations.OPERATION_MEMORY_SUBTRACT) {
+      this.subtractFromMemory();
+      return;
+    }
+    if (operation === operations.OPERATION_MEMORY_RECALL) {
+      this.recallFromMemory();
       return;
     }
     if (operation === operations.OPERATION_SQRT) {
@@ -110,7 +124,7 @@ const CalculatorModel = Backbone.Model.extend({
       this.calculateResult();
       return;
     }
-    if (operation === operations.OPERATION_DOW) {
+    if (operation === operations.OPERATION_DOT) {
       this.addDotOperation();
       return;
     }
@@ -127,6 +141,39 @@ const CalculatorModel = Backbone.Model.extend({
         displayValue: symbol
       });
     }
+  },
+  addToMemory: function() {
+    if (this.attributes.val2.length > 0) {
+      this.set({
+        memoryValue: parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val2)
+      })
+    } else {
+      this.set({
+        memoryValue: parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val1)
+      })
+    }
+  },
+
+  subtractFromMemory: function() {
+    if (this.attributes.val2.length > 0) {
+      this.set({
+        memoryValue: parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val2)
+      })
+    } else {
+      this.set({
+        memoryValue: parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val1)
+      })
+    }
+  },
+
+  recallFromMemory: function() {
+    this.set({
+      displayValue: this.attributes.memoryValue,
+      val1: this.attributes.memoryValue,
+      val2: '',
+      operation: '',
+      memoryValue: '0',
+    })
   },
 
   eraseOperation: function() {
@@ -156,18 +203,30 @@ const CalculatorModel = Backbone.Model.extend({
         return 
       }
       if (parseFloat(this.attributes.val2) > 0) {
-        this.attributes.val2 =  `-${this.attributes.val2}`;
+        this.set({
+          val2: `-${this.attributes.val2}`,
+          displayValue:  `-${this.attributes.val2}`,
+        })
       } else {
-        this.attributes.val2 =  this.attributes.val2.slice(1);
+        this.set({
+          val2: `-${this.attributes.val2.slice(1)}`,
+          displayValue:  `-${this.attributes.val2.slice(1)}`,
+        })
       }
     } else {
       if (parseFloat(this.attributes.val1) === 0 ) {
         return 
       }
       if (parseFloat(this.attributes.val1) > 0) {
-        this.attributes.val1 =  `-${this.attributes.val1}`;
+        this.set({
+          val1: `-${this.attributes.val1}`,
+          displayValue:  `-${this.attributes.val1}`,
+        })
       } else {
-        this.attributes.val1 =  this.attributes.val1.slice(1);
+        this.set({
+          val1: this.attributes.val1.slice(1),
+          displayValue: this.attributes.val1.slice(1),
+        })
       }
     }
   },
@@ -188,15 +247,5 @@ const CalculatorModel = Backbone.Model.extend({
         displayValue: this.attributes.val1
       });
     }
-  }
-});
-
-const ButtonModel = Backbone.Model.extend({
-  defaults: {
-    value: '',
-    class: ''
-  },
-  click: function() {
-    console.log(this.attributes.value)
   }
 });

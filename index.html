@@ -18,17 +18,17 @@
           <div class="row gx-2 mt-2 screen"></div>
           <div class="row gx-2 mt-2">
             <div class="col">
-              <button class=" col-12 btn btn-primary" >
+              <button class=" col-12 btn btn-primary" operation="memoryAdd">
                 M+
               </button>
             </div>
             <div class="col">
-              <button class=" col-12 btn btn-primary" >
+              <button class=" col-12 btn btn-primary" operation="memorySubtract">
                 M-
               </button>
             </div>
             <div class="col">
-              <button class=" col-12 btn btn-primary" >
+              <button class=" col-12 btn btn-primary" operation="memoryRecall">
                 MRC
               </button>
             </div>
@@ -153,8 +153,9 @@
   <script src="bower_components/jquery/dist/jquery.js"></script>
   <script src="bower_components/underscore/underscore-umd.js"></script>
   <script src="bower_components/backbone/backbone.js"></script>
-  <script src="models/models.js"></script>
-  <script src="views/views.js"></script>
+  <script src="models/calculatorModel.js"></script>
+  <script src="views/screenView.js"></script>
+  <script src="views/calculatorView.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
