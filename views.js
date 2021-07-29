@@ -20,7 +20,7 @@ const operationButtons = [
     buttonClass: 'operation-sqrt'
   },
   {
-    value: 'x',
+    value: 'C',
     buttonClass: 'operation-erase'
   },
   {
@@ -49,13 +49,7 @@ const CalculatorView = Backbone.View.extend({
     this.renderOperationalButtons();
     this.renderNumericButtons();
     this.renderScreen();
-    this.listenTo(this.model, 'change', this.onModelChange);
     return this;
-  },
-
-  onModelChange: function() {
-    console.log('change')
-    // this.screen.attributes.result = this.model.get('result');
   },
 
   renderOperationalButtons: function() {
@@ -103,12 +97,13 @@ const ScreenView = Backbone.View.extend({
   template: _.template($('#screen-template').html()),
 
   initialize: function() {
+    this.listenTo(this.model, 'change:displayValue', this.render, this);
     this.render();
   },
   render: function() {
     this.$el.html(this.template(this.model.toJSON()));
     return this;
-  }
+  },
 });
 
 

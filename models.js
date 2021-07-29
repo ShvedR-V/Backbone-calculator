@@ -3,14 +3,14 @@ const CalculatorModel = Backbone.Model.extend({
     val1: '',
     val2: '',
     operation: '',
-    result: ''
+    displayValue: ''
   },
 
   isNumeric: function (value) {
     return /^-?\d+$/.test(value);
   },
   isOperation: function (value) {
-    return /^[-+/*√=]$/.test(value);
+    return /^[-+/*√=C]$/.test(value);
   },
 
   getKey: function(value) {
@@ -23,58 +23,70 @@ const CalculatorModel = Backbone.Model.extend({
   },
 
   calculateResult: function() {
+    let displayValue;
     switch(this.attributes.operation) {
       case '+':
-        this.attributes.result = parseFloat(this.attributes.val1) + parseFloat(this.attributes.val2);
-        this.attributes.set({
-          val1: '',
+        displayValue = parseFloat(this.attributes.val1) + parseFloat(this.attributes.val2);
+        this.set({
+          val1: displayValue,
           val2: '',
-          operation: ''
+          operation: '',
+          displayValue
         })
-        break
+        break;
       case '-':
-        this.attributes.result = parseFloat(this.attributes.val1) - parseFloat(this.attributes.val2);
+        displayValue = parseFloat(this.attributes.val1) - parseFloat(this.attributes.val2);
         this.set({
-          val1: '',
+          val1: displayValue,
           val2: '',
-          operation: ''
+          operation: '',
+          displayValue
         })
-        break
+        break;
       case '*':
-        this.attributes.result = parseFloat(this.attributes.val1) * parseFloat(this.attributes.val2);
+        displayValue = parseFloat(this.attributes.val1) * parseFloat(this.attributes.val2);
         this.set({
-          val1: '',
+          val1: displayValue,
           val2: '',
-          operation: ''
+          operation: '',
+          displayValue
         })
-        break
+        break;
       case '/':
-        this.attributes.result = parseFloat(this.attributes.val1) / parseFloat(this.attributes.val2);
+        displayValue = parseFloat(this.attributes.val1) / parseFloat(this.attributes.val2);
         this.set({
-          val1: '',
+          val1: displayValue,
           val2: '',
-          operation: ''
+          operation: '',
+          displayValue
         })
-        break
+        break;
       case '√':
-        this.attributes.result = parseFloat(this.attributes.val1) ** (0.5);
+        displayValue = parseFloat(this.attributes.val1) ** (0.5);
         this.set({
-          val1: '',
+          val1: displayValue,
           val2: '',
-          operation: ''
+          operation: '',
+          displayValue
         })
-        break
+        break;
     }
   },
 
   setOperation: function(operation) {
     if (operation === '+/-') {
       this.changeSignOperation();
+      this.set({
+        displayValue: this.attributes.val2
+      });
     }
     if (operation === '=') {
       this.calculateResult();
     } else {
       this.attributes.operation = operation;
+      this.set({
+        displayValue: this.attributes.operation
+      });
     }
   },
 
@@ -103,8 +115,14 @@ const CalculatorModel = Backbone.Model.extend({
   setOperand: function(value){
     if (this.attributes.operation) {
       this.attributes.val2 =  `${this.attributes.val2}${value}`;
+      this.set({
+        displayValue: this.attributes.val2
+      });
     } else {
       this.attributes.val1 =  `${this.attributes.val1}${value}`;
+      this.set({
+        displayValue: this.attributes.val1
+      });
     }
   }
 });
