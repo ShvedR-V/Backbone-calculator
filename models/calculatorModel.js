@@ -71,6 +71,16 @@ const CalculatorModel = Backbone.Model.extend({
     ]
   },
 
+  setCalculatedValue: function(displayValue, actions) {
+    this.set({
+      val1: displayValue,
+      val2: '',
+      operation: '',
+      displayValue,
+      actions
+    })
+  },
+
   calculateResult: function() {
     let displayValue;
     let actions;
@@ -78,68 +88,32 @@ const CalculatorModel = Backbone.Model.extend({
       case operations.OPERATION_ADD:
         displayValue = this.normalizeResult(parseFloat(this.attributes.val1) + parseFloat(this.attributes.val2));
         actions = this.addResultToActions(displayValue),
-        this.set({
-          val1: displayValue,
-          val2: '',
-          operation: '',
-          displayValue,
-          actions
-        })
+        this.setCalculatedValue(displayValue, actions);
         break;
       case operations.OPERATION_SUBTRACT:
         displayValue = this.normalizeResult(parseFloat(this.attributes.val1) - parseFloat(this.attributes.val2));
         actions = this.addResultToActions(displayValue),
-        this.set({
-          val1: displayValue,
-          val2: '',
-          operation: '',
-          displayValue,
-          actions
-        })
+        this.setCalculatedValue(displayValue, actions);
         break;
       case operations.OPERATION_MULTIPLY:
         displayValue = this.normalizeResult(parseFloat(this.attributes.val1) * parseFloat(this.attributes.val2));
         actions = this.addResultToActions(displayValue),
-        this.set({
-          val1: displayValue,
-          val2: '',
-          operation: '',
-          displayValue,
-          actions
-        })
+        this.setCalculatedValue(displayValue, actions);
         break;
       case operations.OPERATION_DIVIDE:
         displayValue = this.normalizeResult(parseFloat(this.attributes.val1) / parseFloat(this.attributes.val2));
         actions = this.addResultToActions(displayValue),
-        this.set({
-          val1: displayValue,
-          val2: '',
-          operation: '',
-          displayValue,
-          actions
-        })
+        this.setCalculatedValue(displayValue, actions);
         break;
       case operations.OPERATION_SQRT:
         displayValue = this.normalizeResult(parseFloat(this.attributes.val1) ** (0.5));
         actions = this.addResultToActions(displayValue),
-        this.set({
-          val1: displayValue,
-          val2: '',
-          operation: '',
-          displayValue,
-          actions
-        })
+        this.setCalculatedValue(displayValue, actions);
         break;
       case operations.OPERATION_PERCENT:
         displayValue = this.normalizeResult(parseFloat(this.attributes.val2) *  parseFloat(this.attributes.val1) / 100);
         actions = this.addResultToActions(displayValue),
-        this.set({
-          val1: displayValue,
-          val2: '',
-          operation: '',
-          displayValue,
-          actions
-        })
+        this.setCalculatedValue(displayValue, actions);
         break;
     }
   },
