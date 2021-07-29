@@ -1,16 +1,19 @@
 const CalculatorModel = Backbone.Model.extend({
   defaults: {
-    val1: '',
+    val1: '0',
     val2: '',
     operation: '',
-    displayValue: ''
+    displayValue: '0'
   },
 
   isNumeric: function (value) {
     return /^-?\d+$/.test(value);
   },
   isOperation: function (value) {
-    return /^[-+/*√=C]$/.test(value);
+    return /^[-+/*√.=C]$/.test(value);
+  },
+  includesDot: function (value) {
+    return /\./g.test(value);
   },
 
   getKey: function(value) {
@@ -79,14 +82,50 @@ const CalculatorModel = Backbone.Model.extend({
       this.set({
         displayValue: this.attributes.val2
       });
+      return;
+    }
+    if (operation === '√') {
+      this.attributes.operation = operation;
+      this.calculateResult();
+      return;
+    }
+    if (operation === '.') {
+      this.addDotOperation();
+      return;
+    }
+    if (operation === 'C') {
+      this.eraseOperation();
+      return;
     }
     if (operation === '=') {
       this.calculateResult();
+      return;
     } else {
       this.attributes.operation = operation;
       this.set({
         displayValue: this.attributes.operation
       });
+    }
+  },
+
+  eraseOperation: function() {
+    this.set({
+      val1: '0',
+      val2: '',
+      operation: '',
+      displayValue: '0',
+    })
+  },
+
+  addDotOperation: function() {
+    if (this.attributes.val2.length > 0) {
+      if (!this.includesDot(this.attributes.val2)) {
+        this.setOperand('.');
+      }
+    } else {
+      if (!this.includesDot(this.attributes.val1)) {
+        this.setOperand('.');
+      }
     }
   },
 
@@ -119,7 +158,11 @@ const CalculatorModel = Backbone.Model.extend({
         displayValue: this.attributes.val2
       });
     } else {
-      this.attributes.val1 =  `${this.attributes.val1}${value}`;
+      if (this.attributes.val1 === '0' && value !== '.') {
+        this.attributes.val1 =  value;
+      } else {
+        this.attributes.val1 =  `${this.attributes.val1}${value}`;
+      }
       this.set({
         displayValue: this.attributes.val1
       });
