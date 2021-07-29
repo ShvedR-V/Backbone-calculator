@@ -8,7 +8,6 @@ const CalculatorView = Backbone.View.extend({
   },
 
   initialize: function() {
-    this.listenTo(this.model, 'change:actions', this.onActionListChange, this);
     this.render();
   },
 
@@ -16,11 +15,6 @@ const CalculatorView = Backbone.View.extend({
     this.$el.html(this.template());
     this.renderScreen();
     return this;
-  },
-
-  onActionListChange: function() {
-    console.log(this.model)
-    this.renderListItem();
   },
 
   renderListItem: function() {
