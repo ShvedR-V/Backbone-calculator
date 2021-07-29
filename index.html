@@ -9,10 +9,56 @@
 </head>
 <body>
 
+  <div id="calculator-container"></div>
+  <script type="text/template" id="calculator-template">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-6">
+          <div class="row gx-2 mt-2 screen"></div>
+          <div class="row gx-2 mt-2">
+            <div class="col number-7"></div>
+            <div class="col number-8"></div>
+            <div class="col number-9"></div>
+            <div class="col operation-erase"></div>
+            <div class="col operation-sqrt"></div>
+          </div>
+          <div class="row gx-2 mt-2">
+            <div class="col number-4"></div>
+            <div class="col number-5"></div>
+            <div class="col number-6"></div>
+            <div class="col operation-divide"></div>
+            <div class="col operation-multiply"></div>
+          </div>
+          <div class="row gx-2 mt-2">
+            <div class="col number-1"></div>
+            <div class="col number-2"></div>
+            <div class="col number-3"></div>
+            <div class="col operation-minus"></div>
+            <div class="col operation-plus"></div>
+          </div>
+          <div class="row gx-2 mt-2">
+            <div class="col number-0"></div>
+            <div class="col operation-dot"></div>
+            <div class="col operation-equal"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </script>
+  <script type="text/template" id="button-template">
+    <button class=" col-12 btn btn-primary <%= buttonClass %>" >
+      <%= value %>
+    </button>
+  </script>
+  <script type="text/template" id="screen-template">
+    <div class="p-3 mb-2 bg-success text-white"><%= displayValue %></div>
+  </script>
+  
   <script src="bower_components/jquery/dist/jquery.js"></script>
   <script src="bower_components/underscore/underscore-umd.js"></script>
   <script src="bower_components/backbone/backbone.js"></script>
   <script src="models.js"></script>
+  <script src="views.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
