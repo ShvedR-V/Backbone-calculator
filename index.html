@@ -15,7 +15,7 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-6">
-          <div class="row gx-2 mt-2 screen"></div>
+          <div class="row gx-2 mt-2 screen-container"></div>
           <div class="row gx-2 mt-2">
             <div class="col">
               <button class=" col-12 btn btn-primary" operation="memoryAdd">
@@ -147,7 +147,7 @@
   </script>
 
   <script type="text/template" id="screen-template">
-    <div class="p-3 mb-2 bg-success text-white"><%= displayValue %></div>
+    <input type="text" class="p-3 mb-2 bg-success text-white screen" value=<%= displayValue %> />
   </script>
   
   <script src="bower_components/jquery/dist/jquery.js"></script>
@@ -156,6 +156,6 @@
   <script src="models/calculatorModel.js"></script>
   <script src="views/screenView.js"></script>
   <script src="views/calculatorView.js"></script>
-  <script src="script.js"></script>
+  <script src="index.js"></script>
 </body>
 </html>
