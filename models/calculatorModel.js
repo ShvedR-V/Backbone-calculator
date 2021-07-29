@@ -12,6 +12,7 @@ const operations = {
   OPERATION_MEMORY_ADD: "memoryAdd",
   OPERATION_MEMORY_SUBTRACT: "memorySubtract",
   OPERATION_MEMORY_RECALL: "memoryRecall",
+  OPERATION_UNDO: "undo",
 }
 
 const CalculatorModel = Backbone.Model.extend({
@@ -20,24 +21,41 @@ const CalculatorModel = Backbone.Model.extend({
     val2: '',
     operation: '',
     displayValue: '0',
-    memoryValue: '0'
+    memoryValue: '0',
+  },
+  cache: [],
+
+  addToCache: function() {
+    this.cache.push({...this.attributes})
+  },
+
+  applyFromCache: function() {
+    this.set({
+      ...this.cache.pop()
+    });
+  },
+
+  normalizeResult: function(result) {
+    return (Math.round(result * 1000000000000000) / 1000000000000000)
   },
 
   isNumeric: function (value) {
     return /^-?\d+$/.test(value);
-  },
-  isOperation: function (value) {
-    return /^[-+/*√%.=C]$/.test(value);
   },
   includesDot: function (value) {
     return /\./g.test(value);
   },
 
   getKey: function(operation, symbol) {
-    if (this.isNumeric(operation)){
-      this.setOperand(operation);
+    if (operation === operations.OPERATION_UNDO) {
+      this.applyFromCache();
     } else {
-      this.setOperation(operation, symbol);
+      this.addToCache();
+      if (this.isNumeric(operation)){
+        this.setOperand(operation);
+      } else {
+        this.setOperation(operation, symbol);
+      }
     }
   },
 
@@ -45,7 +63,7 @@ const CalculatorModel = Backbone.Model.extend({
     let displayValue;
     switch(this.attributes.operation) {
       case operations.OPERATION_ADD:
-        displayValue = (parseFloat(this.attributes.val1) + parseFloat(this.attributes.val2)).toString();
+        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) + parseFloat(this.attributes.val2)).toString());
         this.set({
           val1: displayValue,
           val2: '',
@@ -54,7 +72,7 @@ const CalculatorModel = Backbone.Model.extend({
         })
         break;
       case operations.OPERATION_SUBTRACT:
-        displayValue = (parseFloat(this.attributes.val1) - parseFloat(this.attributes.val2)).toString();
+        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) - parseFloat(this.attributes.val2)).toString());
         this.set({
           val1: displayValue,
           val2: '',
@@ -63,7 +81,7 @@ const CalculatorModel = Backbone.Model.extend({
         })
         break;
       case operations.OPERATION_MULTIPLY:
-        displayValue = (parseFloat(this.attributes.val1) * parseFloat(this.attributes.val2)).toString();
+        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) * parseFloat(this.attributes.val2)).toString());
         this.set({
           val1: displayValue,
           val2: '',
@@ -72,7 +90,7 @@ const CalculatorModel = Backbone.Model.extend({
         })
         break;
       case operations.OPERATION_DIVIDE:
-        displayValue = (parseFloat(this.attributes.val1) / parseFloat(this.attributes.val2)).toString();
+        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) / parseFloat(this.attributes.val2)).toString());
         this.set({
           val1: displayValue,
           val2: '',
@@ -81,7 +99,7 @@ const CalculatorModel = Backbone.Model.extend({
         })
         break;
       case operations.OPERATION_SQRT:
-        displayValue = (parseFloat(this.attributes.val1) ** (0.5)).toString();
+        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) ** (0.5)).toString());
         this.set({
           val1: displayValue,
           val2: '',
@@ -90,7 +108,7 @@ const CalculatorModel = Backbone.Model.extend({
         })
         break;
       case operations.OPERATION_PERCENT:
-        displayValue = (parseFloat(this.attributes.val2) *  parseFloat(this.attributes.val1) / 100).toString();
+        displayValue = this.normalizeResult((parseFloat(this.attributes.val2) *  parseFloat(this.attributes.val1) / 100).toString());
         this.set({
           val1: displayValue,
           val2: '',
@@ -109,6 +127,10 @@ const CalculatorModel = Backbone.Model.extend({
     }
     if (operation === operations.OPERATION_MEMORY_ADD) {
       this.addToMemory();
+      return;
+    }
+    if (operation === operations.OPERATION_UNDO) {
+      this.applyFromCache();
       return;
     }
     if (operation === operations.OPERATION_MEMORY_SUBTRACT) {
