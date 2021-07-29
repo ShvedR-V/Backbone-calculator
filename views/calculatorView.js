@@ -8,12 +8,29 @@ const CalculatorView = Backbone.View.extend({
   },
 
   initialize: function() {
+    this.listenTo(this.model, 'change:actions', this.onActionListChange, this);
     this.render();
   },
+
   render: function() {
     this.$el.html(this.template());
     this.renderScreen();
     return this;
+  },
+
+  onActionListChange: function() {
+    console.log(this.model)
+    this.renderListItem();
+  },
+
+  renderListItem: function() {
+    const itemInfo = this.model.attributes.actions[this.model.attributes.actions.length - 1];
+    const actionItem = new ListItemView({
+      model: new actionItemModel({
+        ...itemInfo
+      }),
+    })
+    this.$('.list-group').append(actionItem.el);
   },
 
   renderScreen: function(){
