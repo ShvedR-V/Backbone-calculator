@@ -184,7 +184,7 @@ const CalculatorModel = Backbone.Model.extend({
         break;
       default:
         this.attributes.symbol = symbol;
-        if (this.attributes.operation) {
+        if (this.attributes.operation && this.attributes.val2) {
           this.calculateResult();
           this.attributes.operation = operation;
         } else {
@@ -207,8 +207,8 @@ const CalculatorModel = Backbone.Model.extend({
   },
 
   addToMemory: function() {
-    if (this.attributes.val2.length > 0) {
-      if (this.attributes.val2 !== CALCULATION_ERROR) {
+    if (this.attributes.val2) {
+      if (this.attributes.displayValue !== CALCULATION_ERROR) {
         const memoryValue = parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val2);
         this.setMemoryValue(
           memoryValue, 
@@ -216,7 +216,7 @@ const CalculatorModel = Backbone.Model.extend({
           );
       }
     } else {
-      if (this.attributes.val1 !== CALCULATION_ERROR) {
+      if (this.attributes.displayValue !== CALCULATION_ERROR) {
         const memoryValue = parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val1);
         this.setMemoryValue(
           memoryValue,
@@ -227,19 +227,22 @@ const CalculatorModel = Backbone.Model.extend({
   },
 
   subtractFromMemory: function() {
-    if (this.attributes.val2.length > 0) {
-      const  memoryValue = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val2);
-      this.setMemoryValue(
-        memoryValue,
-        `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`
-      )
-      
+    if (this.attributes.val2) {
+      if (this.attributes.displayValue !== CALCULATION_ERROR) {
+        const  memoryValue = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val2);
+        this.setMemoryValue(
+          memoryValue,
+          `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`
+        )
+      }
     } else {
-      const memoryValue  = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val1);
-      this.setMemoryValue(
-        memoryValue,
-        `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`
-      )
+      if (this.attributes.displayValue !== CALCULATION_ERROR) {
+        const memoryValue  = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val1);
+        this.setMemoryValue(
+          memoryValue,
+          `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`
+        )
+      }
     }
   },
 
@@ -284,7 +287,7 @@ const CalculatorModel = Backbone.Model.extend({
 
   changeSignOperation: function () {
     if (this.attributes.operation) {
-      if (parseFloat(this.attributes.val2) === 0 ) {
+      if (!this.attributes.val2) {
         return 
       }
       if (parseFloat(this.attributes.val2) > 0) {
