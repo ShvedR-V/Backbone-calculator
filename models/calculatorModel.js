@@ -13,6 +13,7 @@ const operations = {
   OPERATION_MEMORY_SUBTRACT: "memorySubtract",
   OPERATION_MEMORY_RECALL: "memoryRecall",
   OPERATION_UNDO: "undo",
+  OPERATION_BACKSPACE: "Backspace",
 }
 
 const CALCULATION_ERROR = 'error';
@@ -54,7 +55,7 @@ const CalculatorModel = Backbone.Model.extend({
     return /\./g.test(value);
   },
 
-  getKey: function(operation, symbol) {
+  evaluateCommand: function(operation, symbol) {
     if (operation === operations.OPERATION_UNDO) {
       this.applyFromCache();
     } else {
@@ -140,10 +141,29 @@ const CalculatorModel = Backbone.Model.extend({
     }
   },
 
+  backspaceOperation: function(){
+    if (this.attributes.val2 && this.attributes.operation) {
+      this.attributes.val2 =  this.attributes.val2.slice(0, -1);
+      this.set({
+        val2: this.attributes.val2,
+        displayValue: this.attributes.val2
+      });
+    } else {
+      this.attributes.val1 =  this.attributes.val1.slice(0, -1);
+      this.set({
+        val1: this.attributes.val1,
+        displayValue: this.attributes.val1
+      });
+    }
+  },
+
   setOperation: function(operation, symbol) {
     switch(operation ) {
       case operations.OPERATION_CHANGE_SIGN:
         this.changeSignOperation();
+        break;
+      case operations.OPERATION_BACKSPACE:
+        this.backspaceOperation();
         break;
       case operations.OPERATION_MEMORY_ADD:
         this.addToMemory();
