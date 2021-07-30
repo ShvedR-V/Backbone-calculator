@@ -15,6 +15,8 @@ const operations = {
   OPERATION_UNDO: "undo",
 }
 
+const CALCULATION_ERROR = 'error';
+
 const CalculatorModel = Backbone.Model.extend({
   defaults: {
     val1: '0',
@@ -38,8 +40,11 @@ const CalculatorModel = Backbone.Model.extend({
   },
 
   normalizeResult: function(result) {
-    const normalizedResult = (Math.round(result * 1000000000000000) / 1000000000000000).toString()
-    return isNaN(normalizedResult) ? '0' : normalizedResult;
+    if ( isNaN(result) || result === Infinity || result === -Infinity){
+      return CALCULATION_ERROR;
+    } else {
+      return (Math.round(result * 1000000000000000) / 1000000000000000).toString();
+    }
   },
 
   isNumeric: function (value) {
@@ -74,13 +79,23 @@ const CalculatorModel = Backbone.Model.extend({
 
   setCalculatedValue: function(displayValue) {
     const actions = this.addResultToActions(displayValue);
-    this.set({
-      val1: displayValue,
-      val2: '',
-      operation: '',
-      displayValue,
-      actions
-    })
+    if (displayValue === CALCULATION_ERROR) {
+      this.set({
+        val1: '0',
+        val2: '',
+        operation: '',
+        displayValue,
+        actions
+      })
+    } else {
+      this.set({
+        val1: displayValue,
+        val2: '',
+        operation: '',
+        displayValue,
+        actions
+      })
+    }
   },
 
   calculateResult: function() {
@@ -169,7 +184,7 @@ const CalculatorModel = Backbone.Model.extend({
         break;
       default:
         this.attributes.symbol = symbol;
-        if (this.attributes.operation) {
+        if (this.attributes.operation && this.attributes.val2) {
           this.calculateResult();
           this.attributes.operation = operation;
         } else {
@@ -192,35 +207,42 @@ const CalculatorModel = Backbone.Model.extend({
   },
 
   addToMemory: function() {
-    if (this.attributes.val2.length > 0) {
-      const memoryValue = parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val2);
-      this.setMemoryValue(
-        memoryValue, 
-        `Memory: ${this.attributes.memoryValue} + ${this.attributes.val2}`
-        );
+    if (this.attributes.val2) {
+      if (this.attributes.displayValue !== CALCULATION_ERROR) {
+        const memoryValue = parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val2);
+        this.setMemoryValue(
+          memoryValue, 
+          `Memory: ${this.attributes.memoryValue} + ${this.attributes.val2}`
+          );
+      }
     } else {
-      const memoryValue = parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val1);
-      this.setMemoryValue(
-        memoryValue,
-        `Memory: ${this.attributes.memoryValue} + ${this.attributes.val1}`
-      )
+      if (this.attributes.displayValue !== CALCULATION_ERROR) {
+        const memoryValue = parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val1);
+        this.setMemoryValue(
+          memoryValue,
+          `Memory: ${this.attributes.memoryValue} + ${this.attributes.val1}`
+        )
+      }
     }
   },
 
   subtractFromMemory: function() {
-    if (this.attributes.val2.length > 0) {
-      const  memoryValue = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val2);
-      this.setMemoryValue(
-        memoryValue,
-        `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`
-      )
-      
+    if (this.attributes.val2) {
+      if (this.attributes.displayValue !== CALCULATION_ERROR) {
+        const  memoryValue = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val2);
+        this.setMemoryValue(
+          memoryValue,
+          `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`
+        )
+      }
     } else {
-      const memoryValue  = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val1);
-      this.setMemoryValue(
-        memoryValue,
-        `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`
-      )
+      if (this.attributes.displayValue !== CALCULATION_ERROR) {
+        const memoryValue  = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val1);
+        this.setMemoryValue(
+          memoryValue,
+          `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`
+        )
+      }
     }
   },
 
@@ -265,7 +287,7 @@ const CalculatorModel = Backbone.Model.extend({
 
   changeSignOperation: function () {
     if (this.attributes.operation) {
-      if (parseFloat(this.attributes.val2) === 0 ) {
+      if (!this.attributes.val2) {
         return 
       }
       if (parseFloat(this.attributes.val2) > 0) {
