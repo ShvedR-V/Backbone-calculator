@@ -25,23 +25,45 @@
           <div class="row gx-2 mt-2 screen-container"></div>
           <div class="row gx-2 mt-2">
             <div class="col">
-              <button class=" col-12 btn btn-primary" operation="memoryAdd">
+              <button class=" col-12 btn btn-warning" operation="memoryAdd">
                 M+
               </button>
             </div>
             <div class="col">
-              <button class=" col-12 btn btn-primary" operation="memorySubtract">
+              <button class=" col-12 btn btn-warning" operation="memorySubtract">
                 M-
               </button>
             </div>
             <div class="col">
-              <button class=" col-12 btn btn-primary" operation="memoryRecall">
+              <button class=" col-12 btn btn-warning" operation="memoryRecall">
                 MRC
               </button>
             </div>
             <div class="col">
-              <button class=" col-12 btn btn-primary" operation="changeSign">
-                +/-
+              <button class=" col-12 btn btn-warning" operation="undo">
+                undo
+              </button>
+            </div>
+          </div>
+          <div class="row gx-2 mt-2">
+            <div class="col">
+              <button class=" col-12 btn btn-info" operation="7">
+                7
+              </button>
+            </div>
+            <div class="col">
+              <button class=" col-12 btn btn-info" operation="8">
+                8
+              </button>
+            </div>
+            <div class="col">
+              <button class=" col-12 btn btn-info" operation="9">
+                9
+              </button>
+            </div>
+            <div class="col">
+              <button class=" col-12 btn btn-primary" operation="sqrt">
+                √
               </button>
             </div>
             <div class="col">
@@ -52,44 +74,17 @@
           </div>
           <div class="row gx-2 mt-2">
             <div class="col">
-              <button class=" col-12 btn btn-primary" operation="7">
-                7
-              </button>
-            </div>
-            <div class="col">
-              <button class=" col-12 btn btn-primary" operation="8">
-                8
-              </button>
-            </div>
-            <div class="col">
-              <button class=" col-12 btn btn-primary" operation="9">
-                9
-              </button>
-            </div>
-            <div class="col">
-              <button class=" col-12 btn btn-primary" operation="erase">
-                C
-              </button>
-            </div>
-            <div class="col">
-              <button class=" col-12 btn btn-primary" operation="sqrt">
-                √
-              </button>
-            </div>
-          </div>
-          <div class="row gx-2 mt-2">
-            <div class="col">
-              <button class=" col-12 btn btn-primary" operation="4">
+              <button class=" col-12 btn btn-info" operation="4">
                 4
               </button>
             </div>
             <div class="col">
-              <button class=" col-12 btn btn-primary" operation="5">
+              <button class=" col-12 btn btn-info" operation="5">
                 5
               </button>
             </div>
             <div class="col">
-              <button class=" col-12 btn btn-primary" operation="6">
+              <button class=" col-12 btn btn-info" operation="6">
                 6
               </button>
             </div>
@@ -106,17 +101,17 @@
           </div>
           <div class="row gx-2 mt-2">
             <div class="col number-1">
-              <button class=" col-12 btn btn-primary" operation="1">
+              <button class=" col-12 btn btn-info" operation="1">
                 1
               </button>
             </div>
             <div class="col number-2">
-              <button class=" col-12 btn btn-primary" operation="2">
+              <button class=" col-12 btn btn-info" operation="2">
                 2
               </button>
             </div>
             <div class="col number-3">
-              <button class=" col-12 btn btn-primary" operation="3">
+              <button class=" col-12 btn btn-info" operation="3">
                 3
               </button>
             </div>
@@ -132,24 +127,30 @@
             </div>
           </div>
           <div class="row gx-2 mt-2">
-            <div class="col number-0">
-              <button class=" col-12 btn btn-primary" operation="0">
-                0
-              </button>
-            </div>
             <div class="col">
-              <button class=" col-12 btn btn-primary" operation="dot">
+              <button class=" col-12 btn btn-secondary" operation="dot">
                 .
               </button>
             </div>
+            <div class="col number-0">
+              <button class=" col-12 btn btn-info" operation="0">
+                0
+              </button>
+            </div>
+
             <div class="col">
-              <button class=" col-12 btn btn-primary" operation="equals">
+              <button class=" col-12 btn btn-secondary" operation="equals">
                 =
               </button>
             </div>
             <div class="col">
-              <button class=" col-12 btn btn-primary" operation="undo">
-                undo
+              <button class=" col-12 btn btn-primary" operation="changeSign">
+                +/-
+              </button>
+            </div>
+            <div class="col">
+              <button class=" col-12 btn btn-danger" operation="erase">
+                C
               </button>
             </div>
           </div>
@@ -172,17 +173,17 @@
   </script>
 
   <script type="text/template" id="screen-template">
-    <input type="text" class="p-3 col-12 mb-2 bg-success text-white screen" value=<%= displayValue %> />
+    <input type="text" class="p-3 col-12 mb-2 bg-light border-success rounded text-black screen" value=<%= displayValue %> />
   </script>
   <script type="text/template" id="action-list-item-template">
-    <li class="list-group-item list-group-item-action">
+    <li class="list-group-item list-group-flush">
       <%= calculation %> 
         <%= result === '' ? '' : '=' %>
       <%= result %>
     </li>
   </script>
   <script type="text/template" id="action-list-empty-template">
-    <li class="list-group-item list-group-item-action">
+    <li class="list-group-item list-group-item">
       There was no actions made.
     </li>
   </script>
