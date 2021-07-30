@@ -1,7 +1,39 @@
 const calculator = new CalculatorModel({});
+let calculatorView;
+let actionListView;
 
-const calculatorView = new CalculatorView({
-  model: calculator
+const Router = Backbone.Router.extend({
+  
+  routes: {
+    '': 'calculator',
+    'actions': 'actions'
+  },
+
+  calculator: function() {
+
+    if (actionListView) {
+      actionListView.remove();
+    }
+    calculatorView = new CalculatorView({
+      model: calculator
+    });
+
+    $('#main-container').append(calculatorView.el);
+  },
+
+  actions: function() {
+    if (calculatorView) {
+      calculatorView.remove();
+    }
+    actionListView = new ActionListView({
+      model: calculator
+    });
+
+    $('#main-container').append(actionListView.el);
+  }
+
 });
 
-$('#calculator-container').append(calculatorView.el)
+const project = new Router();
+
+Backbone.history.start();

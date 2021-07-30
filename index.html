@@ -9,12 +9,19 @@
 </head>
 <body>
 
-  <div id="calculator-container"></div>
+  <div id="main-container"></div>
 
   <script type="text/template" id="calculator-template">
-    <div class="container">
+    
+    <div class="container mt-2">
+
       <div class="row justify-content-center">
         <div class="col-6">
+          <div class="row gx-2 mt-2 " >
+            <div class="col d-flex justify-content-center">
+              <a href="#/actions" class="link-primary">To Actions</a>
+            </div>
+          </div>         
           <div class="row gx-2 mt-2 screen-container"></div>
           <div class="row gx-2 mt-2">
             <div class="col">
@@ -147,6 +154,19 @@
             </div>
           </div>
         </div>
+
+      </div>
+    </div>
+  </script>
+  <script type="text/template" id="action-list-template">
+    <div class="container">
+      <div class="row d-flex justify-content-center mt-2">
+        <div class="col-6  d-flex align-items-center flex-column ">
+          <a href="#" class="link-primary mt-2">Calculator</a>
+          <ul class="list-group mt-2">
+
+          </ul>
+        </div>
       </div>
     </div>
   </script>
@@ -154,11 +174,27 @@
   <script type="text/template" id="screen-template">
     <input type="text" class="p-3 col-12 mb-2 bg-success text-white screen" value=<%= displayValue %> />
   </script>
+  <script type="text/template" id="action-list-item-template">
+    <li class="list-group-item list-group-item-action">
+      <%= calculation %> 
+        <%= result === '' ? '' : '=' %>
+      <%= result %>
+    </li>
+  </script>
+  <script type="text/template" id="action-list-empty-template">
+    <li class="list-group-item list-group-item-action">
+      There was no actions made.
+    </li>
+  </script>
   
   <script src="bower_components/jquery/dist/jquery.js"></script>
   <script src="bower_components/underscore/underscore-umd.js"></script>
   <script src="bower_components/backbone/backbone.js"></script>
   <script src="models/calculatorModel.js"></script>
+  <script src="models/actionItemModel.js"></script>
+  <script src="views/listItemEmptyView.js"></script>
+  <script src="views/listItemView.js"></script>
+  <script src="views/actionListView.js"></script>
   <script src="views/screenView.js"></script>
   <script src="views/calculatorView.js"></script>
   <script src="index.js"></script>

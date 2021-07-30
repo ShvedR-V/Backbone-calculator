@@ -20,13 +20,15 @@ const CalculatorModel = Backbone.Model.extend({
     val1: '0',
     val2: '',
     operation: '',
+    symbol: '',
     displayValue: '0',
     memoryValue: '0',
+    actions: []
   },
   cache: [],
 
   addToCache: function() {
-    this.cache.push({...this.attributes})
+    this.cache.push({...this.attributes});
   },
 
   applyFromCache: function() {
@@ -36,7 +38,8 @@ const CalculatorModel = Backbone.Model.extend({
   },
 
   normalizeResult: function(result) {
-    return (Math.round(result * 1000000000000000) / 1000000000000000)
+    const normalizedResult = (Math.round(result * 1000000000000000) / 1000000000000000).toString()
+    return isNaN(normalizedResult) ? '0' : normalizedResult;
   },
 
   isNumeric: function (value) {
@@ -59,132 +62,165 @@ const CalculatorModel = Backbone.Model.extend({
     }
   },
 
+  addResultToActions: function(result) {
+    return [
+      ...this.attributes.actions, 
+      {
+        calculation: `${this.attributes.val1} ${this.attributes.symbol} ${this.attributes.val2}`,
+        result
+      }
+    ]
+  },
+
+  setCalculatedValue: function(displayValue) {
+    const actions = this.addResultToActions(displayValue);
+    this.set({
+      val1: displayValue,
+      val2: '',
+      operation: '',
+      displayValue,
+      actions
+    })
+  },
+
   calculateResult: function() {
     let displayValue;
     switch(this.attributes.operation) {
       case operations.OPERATION_ADD:
-        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) + parseFloat(this.attributes.val2)).toString());
-        this.set({
-          val1: displayValue,
-          val2: '',
-          operation: '',
-          displayValue
-        })
+        displayValue = this.normalizeResult(parseFloat(this.attributes.val1) + parseFloat(this.attributes.val2));
+        this.setCalculatedValue(displayValue);
         break;
       case operations.OPERATION_SUBTRACT:
-        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) - parseFloat(this.attributes.val2)).toString());
-        this.set({
-          val1: displayValue,
-          val2: '',
-          operation: '',
-          displayValue
-        })
+        displayValue = this.normalizeResult(parseFloat(this.attributes.val1) - parseFloat(this.attributes.val2));
+        this.setCalculatedValue(displayValue);
         break;
       case operations.OPERATION_MULTIPLY:
-        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) * parseFloat(this.attributes.val2)).toString());
-        this.set({
-          val1: displayValue,
-          val2: '',
-          operation: '',
-          displayValue
-        })
+        displayValue = this.normalizeResult(parseFloat(this.attributes.val1) * parseFloat(this.attributes.val2));
+        this.setCalculatedValue(displayValue);
         break;
       case operations.OPERATION_DIVIDE:
-        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) / parseFloat(this.attributes.val2)).toString());
-        this.set({
-          val1: displayValue,
-          val2: '',
-          operation: '',
-          displayValue
-        })
+        displayValue = this.normalizeResult(parseFloat(this.attributes.val1) / parseFloat(this.attributes.val2));
+        this.setCalculatedValue(displayValue);
         break;
       case operations.OPERATION_SQRT:
-        displayValue = this.normalizeResult((parseFloat(this.attributes.val1) ** (0.5)).toString());
-        this.set({
-          val1: displayValue,
-          val2: '',
-          operation: '',
-          displayValue
-        })
+        displayValue = this.normalizeResult(parseFloat(this.attributes.val1) ** (0.5));
+        this.setCalculatedValue(displayValue);
         break;
       case operations.OPERATION_PERCENT:
-        displayValue = this.normalizeResult((parseFloat(this.attributes.val2) *  parseFloat(this.attributes.val1) / 100).toString());
-        this.set({
-          val1: displayValue,
-          val2: '',
-          operation: '',
-          displayValue
-        })
+        this.percentOperation();
         break;
+    }
+  },
+
+  percentOperation: function() {
+    if (this.attributes.val2) {
+      const displayValue = this.normalizeResult(parseFloat(this.attributes.val2) *  parseFloat(this.attributes.val1) / 100);
+      this.set({
+        val2: displayValue,
+        displayValue
+      })
+    } else {
+      displayValue = this.normalizeResult(parseFloat(this.attributes.val1) / 100);
+      this.setCalculatedValue(displayValue);
     }
   },
 
   setOperation: function(operation, symbol) {
-    if (operation === operations.OPERATION_CHANGE_SIGN) {
-
-      this.changeSignOperation();
-      return;
-    }
-    if (operation === operations.OPERATION_MEMORY_ADD) {
-      this.addToMemory();
-      return;
-    }
-    if (operation === operations.OPERATION_UNDO) {
-      this.applyFromCache();
-      return;
-    }
-    if (operation === operations.OPERATION_MEMORY_SUBTRACT) {
-      this.subtractFromMemory();
-      return;
-    }
-    if (operation === operations.OPERATION_MEMORY_RECALL) {
-      this.recallFromMemory();
-      return;
-    }
-    if (operation === operations.OPERATION_SQRT) {
-      this.attributes.operation = operation;
-      this.calculateResult();
-      return;
-    }
-    if (operation === operations.OPERATION_DOT) {
-      this.addDotOperation();
-      return;
-    }
-    if (operation === operations.OPERATION_ERASE) {
-      this.eraseOperation();
-      return;
-    }
-    if (operation === operations.OPERATION_EQUALS) {
-      this.calculateResult();
-      return;
-    } else {
-      this.attributes.operation = operation;
-      this.set({
-        displayValue: symbol
-      });
+    switch(operation ) {
+      case operations.OPERATION_CHANGE_SIGN:
+        this.changeSignOperation();
+        break;
+      case operations.OPERATION_MEMORY_ADD:
+        this.addToMemory();
+        break;
+      case operations.OPERATION_UNDO:
+        this.applyFromCache();
+        break;
+      case operations.OPERATION_MEMORY_SUBTRACT:
+        this.subtractFromMemory();
+        break;
+      case operations.OPERATION_MEMORY_RECALL:
+        this.recallFromMemory();
+        break;
+      case operations.OPERATION_PERCENT:
+        this.percentOperation();
+        break;
+      case operations.OPERATION_SQRT:
+        this.attributes.symbol = symbol;
+        if (this.attributes.operation) {
+          this.calculateResult();
+          this.attributes.operation = operation;
+        } else {
+          this.attributes.operation = operation;
+          this.calculateResult();
+        }
+        break;
+      case operations.OPERATION_DOT:
+        this.addDotOperation();
+        break;
+      case operations.OPERATION_ERASE:
+        this.eraseOperation();
+        break;
+      case operations.OPERATION_EQUALS:
+        if(this.attributes.operation === '' || this.attributes.val2 === '') {
+          return;
+        }
+        this.calculateResult();
+        break;
+      default:
+        this.attributes.symbol = symbol;
+        if (this.attributes.operation) {
+          this.calculateResult();
+          this.attributes.operation = operation;
+        } else {
+          this.attributes.operation = operation;
+        }
     }
   },
+
+  setMemoryValue: function(memoryValue, calculation) {
+    this.set({
+      memoryValue,
+      actions: [
+        ...this.attributes.actions, 
+        {
+          calculation,
+          result: memoryValue
+        }
+      ]
+    })
+  },
+
   addToMemory: function() {
     if (this.attributes.val2.length > 0) {
-      this.set({
-        memoryValue: parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val2)
-      })
+      const memoryValue = parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val2);
+      this.setMemoryValue(
+        memoryValue, 
+        `Memory: ${this.attributes.memoryValue} + ${this.attributes.val2}`
+        );
     } else {
-      this.set({
-        memoryValue: parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val1)
-      })
+      const memoryValue = parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val1);
+      this.setMemoryValue(
+        memoryValue,
+        `Memory: ${this.attributes.memoryValue} + ${this.attributes.val1}`
+      )
     }
   },
 
   subtractFromMemory: function() {
     if (this.attributes.val2.length > 0) {
-      this.set({
-        memoryValue: parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val2)
-      })
+      const  memoryValue = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val2);
+      this.setMemoryValue(
+        memoryValue,
+        `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`
+      )
+      
     } else {
-      this.set({
-        memoryValue: parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val1)
-      })
+      const memoryValue  = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val1);
+      this.setMemoryValue(
+        memoryValue,
+        `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`
+      )
     }
   },
 
@@ -195,6 +231,13 @@ const CalculatorModel = Backbone.Model.extend({
       val2: '',
       operation: '',
       memoryValue: '0',
+      actions: [
+        ...this.attributes.actions, 
+        {
+          calculation: `Recalled from memory: ${this.attributes.memoryValue}`,
+          result: ''
+        }
+      ]
     })
   },
 
@@ -204,6 +247,7 @@ const CalculatorModel = Backbone.Model.extend({
       val2: '',
       operation: '',
       displayValue: '0',
+      symbol: '',
     })
   },
 
