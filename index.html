@@ -44,6 +44,11 @@
                 undo
               </button>
             </div>
+            <div class="col">
+              <button class=" col-12 btn btn-danger" operation="Backspace">
+                &#8592;    
+              </button>
+            </div>
           </div>
           <div class="row gx-2 mt-2">
             <div class="col">
@@ -150,7 +155,7 @@
             </div>
             <div class="col">
               <button class=" col-12 btn btn-danger" operation="erase">
-                C
+                AC
               </button>
             </div>
           </div>
@@ -159,6 +164,7 @@
       </div>
     </div>
   </script>
+
   <script type="text/template" id="action-list-template">
     <div class="container">
       <div class="row d-flex justify-content-center mt-2">
@@ -173,7 +179,7 @@
   </script>
 
   <script type="text/template" id="screen-template">
-    <input type="text" class="p-3 col-12 mb-2 bg-light border-success rounded text-black screen" value=<%= displayValue %> />
+    <input type="text" class="p-3 col-12 mb-2 bg-light border-success rounded text-black screen" value="<%= displayValue %>" />
   </script>
   <script type="text/template" id="action-list-item-template">
     <li class="list-group-item list-group-flush">

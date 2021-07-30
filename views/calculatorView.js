@@ -4,10 +4,13 @@ const CalculatorView = Backbone.View.extend({
 
   events: {
     'click .btn': 'onClickButton',
-    'keydown .screen': 'onKeyPress'
   },
 
   initialize: function() {
+    _.bindAll(this, 'onKeyPress');
+    $(window).on({
+      'keydown': this.onKeyPress
+    });
     this.render();
   },
 
@@ -37,24 +40,55 @@ const CalculatorView = Backbone.View.extend({
   onClickButton: function(event){
     const symbol = $(event.currentTarget)[0].innerText;
     const operation = $(event.currentTarget)[0].attributes.operation.value;
-    this.model.getKey(operation, symbol);
+    this.model.evaluateCommand(operation, symbol);
   },
 
-  validateKeyBoardPress: function(keyValue) {
+  validateNumericKeyPress: function(keyValue) {
     return /^[0-9]+$/.test(keyValue)
   },
 
+  validateOperationKeyPress: function(keyValue) {
+    return /^[/*+%-=.]+$/.test(keyValue)
+  },
+
+
   onKeyPress: function(event) {
-    const screenValue = this.$('.screen').val();
-    if(this.validateKeyBoardPress(event.key)){
-      this.model.getKey(event.key, event.key);
-    } else {
-      event.preventDefault();
+    if(this.validateNumericKeyPress(event.key)){
+      this.model.evaluateCommand(event.key, event.key);
+    } 
+    else if (event.key === 'Backspace') {
+      this.model.evaluateCommand(event.key, event.key);
     }
-    $(".screen").val('');
-    if (screenValue !== '0') {
-      $(".screen").val(screenValue);
+    else if (this.validateOperationKeyPress(event.key)){
+      let operation;
+      switch(event.key) {
+        case '+':
+          operation = 'add';
+          event.preventDefault();
+          break;
+        case '-':
+          operation = 'subtract';
+          event.preventDefault();
+          break;
+        case '/':
+          operation = 'divide';
+          event.preventDefault();
+          break;
+        case '*':
+          operation = 'multiply';
+          event.preventDefault();
+          break;
+        case '.':
+          operation = 'dot';
+          break;
+        case '%':
+          operation = 'percent';
+          break;
+        default:
+          break;
+      }
+      this.model.evaluateCommand(operation, event.key);
     }
-    $(".screen").focus();
+    event.preventDefault();
   }
 });
