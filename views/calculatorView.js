@@ -81,6 +81,9 @@ const CalculatorView = Backbone.View.extend({
         case '.':
           operation = 'dot';
           break;
+        case '=':
+          operation = 'equals';
+          break;
         case '%':
           operation = 'percent';
           break;

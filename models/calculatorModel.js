@@ -294,9 +294,13 @@ const CalculatorModel = Backbone.Model.extend({
   },
 
   addDotOperation: function() {
-    if (this.attributes.val2.length > 0) {
+    if (this.attributes.operation) {
       if (!this.includesDot(this.attributes.val2)) {
-        this.setOperand('.');
+        if (this.attributes.val2){
+          this.setOperand('.');
+        } else {
+          this.setOperand('0.');
+        }
       }
     } else {
       if (!this.includesDot(this.attributes.val1)) {
