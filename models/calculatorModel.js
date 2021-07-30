@@ -85,7 +85,6 @@ const CalculatorModel = Backbone.Model.extend({
 
   calculateResult: function() {
     let displayValue;
-    let actions;
     switch(this.attributes.operation) {
       case operations.OPERATION_ADD:
         displayValue = this.normalizeResult(parseFloat(this.attributes.val1) + parseFloat(this.attributes.val2));
@@ -108,9 +107,21 @@ const CalculatorModel = Backbone.Model.extend({
         this.setCalculatedValue(displayValue);
         break;
       case operations.OPERATION_PERCENT:
-        displayValue = this.normalizeResult(parseFloat(this.attributes.val2) *  parseFloat(this.attributes.val1) / 100);
-        this.setCalculatedValue(displayValue);
+        this.percentOperation();
         break;
+    }
+  },
+
+  percentOperation: function() {
+    if (this.attributes.val2) {
+      const displayValue = this.normalizeResult(parseFloat(this.attributes.val2) *  parseFloat(this.attributes.val1) / 100);
+      this.set({
+        val2: displayValue,
+        displayValue
+      })
+    } else {
+      displayValue = this.normalizeResult(parseFloat(this.attributes.val1) / 100);
+      this.setCalculatedValue(displayValue);
     }
   },
 
@@ -122,7 +133,7 @@ const CalculatorModel = Backbone.Model.extend({
       case operations.OPERATION_MEMORY_ADD:
         this.addToMemory();
         break;
-      case operations.OPERATION_UND:
+      case operations.OPERATION_UNDO:
         this.applyFromCache();
         break;
       case operations.OPERATION_MEMORY_SUBTRACT:
@@ -130,6 +141,9 @@ const CalculatorModel = Backbone.Model.extend({
         break;
       case operations.OPERATION_MEMORY_RECALL:
         this.recallFromMemory();
+        break;
+      case operations.OPERATION_PERCENT:
+        this.percentOperation();
         break;
       case operations.OPERATION_SQRT:
         this.attributes.symbol = symbol;
@@ -163,61 +177,50 @@ const CalculatorModel = Backbone.Model.extend({
         }
     }
   },
+
+  setMemoryValue: function(memoryValue, calculation) {
+    this.set({
+      memoryValue,
+      actions: [
+        ...this.attributes.actions, 
+        {
+          calculation,
+          result: memoryValue
+        }
+      ]
+    })
+  },
+
   addToMemory: function() {
     if (this.attributes.val2.length > 0) {
-      const memoryValue = parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val2)
-      this.set({
-        memoryValue,
-        actions: [
-          ...this.attributes.actions, 
-          {
-            calculation: `Memory: ${this.attributes.memoryValue} + ${this.attributes.val2}`,
-            result: memoryValue
-          }
-        ]
-      })
-
+      const memoryValue = parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val2);
+      this.setMemoryValue(
+        memoryValue, 
+        `Memory: ${this.attributes.memoryValue} + ${this.attributes.val2}`
+        );
     } else {
-      const memoryValue = parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val1)
-      this.set({
+      const memoryValue = parseFloat(this.attributes.memoryValue) +  parseFloat(this.attributes.val1);
+      this.setMemoryValue(
         memoryValue,
-        actions: [
-          ...this.attributes.actions, 
-          {
-            calculation: `Memory: ${this.attributes.memoryValue} + ${this.attributes.val1}`,
-            result: memoryValue
-          }
-        ]
-      })
+        `Memory: ${this.attributes.memoryValue} + ${this.attributes.val1}`
+      )
     }
   },
 
   subtractFromMemory: function() {
     if (this.attributes.val2.length > 0) {
-      const  memoryValue = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val2)
-      this.set({
+      const  memoryValue = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val2);
+      this.setMemoryValue(
         memoryValue,
-        actions: [
-          ...this.attributes.actions, 
-          {
-            calculation: `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`,
-            result: memoryValue
-          }
-        ]
-      })
+        `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`
+      )
       
     } else {
-      const memoryValue  = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val1)
-      this.set({
+      const memoryValue  = parseFloat(this.attributes.memoryValue) -  parseFloat(this.attributes.val1);
+      this.setMemoryValue(
         memoryValue,
-        actions: [
-          ...this.attributes.actions, 
-          {
-            calculation: `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`,
-            result: memoryValue
-          }
-        ]
-      })
+        `Memory: ${this.attributes.memoryValue} - ${this.attributes.val1}`
+      )
     }
   },
 

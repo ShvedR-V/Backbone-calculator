@@ -4,7 +4,6 @@ const ActionListView = Backbone.View.extend({
   initialize: function() {
     this.render();
     this.renderActionList();
-    console.log(this.model)
   },
 
   renderActionList: function() {
@@ -21,7 +20,6 @@ const ActionListView = Backbone.View.extend({
   },
 
   renderListItem: function(actionInfo) {
-    console.log(actionInfo)
     const actionItem = new ListItemView({
       model: new actionItemModel({
         ...actionInfo
