@@ -72,7 +72,8 @@ const CalculatorModel = Backbone.Model.extend({
     ]
   },
 
-  setCalculatedValue: function(displayValue, actions) {
+  setCalculatedValue: function(displayValue) {
+    const actions = this.addResultToActions(displayValue);
     this.set({
       val1: displayValue,
       val2: '',
@@ -88,91 +89,78 @@ const CalculatorModel = Backbone.Model.extend({
     switch(this.attributes.operation) {
       case operations.OPERATION_ADD:
         displayValue = this.normalizeResult(parseFloat(this.attributes.val1) + parseFloat(this.attributes.val2));
-        actions = this.addResultToActions(displayValue),
-        this.setCalculatedValue(displayValue, actions);
+        this.setCalculatedValue(displayValue);
         break;
       case operations.OPERATION_SUBTRACT:
         displayValue = this.normalizeResult(parseFloat(this.attributes.val1) - parseFloat(this.attributes.val2));
-        actions = this.addResultToActions(displayValue),
-        this.setCalculatedValue(displayValue, actions);
+        this.setCalculatedValue(displayValue);
         break;
       case operations.OPERATION_MULTIPLY:
         displayValue = this.normalizeResult(parseFloat(this.attributes.val1) * parseFloat(this.attributes.val2));
-        actions = this.addResultToActions(displayValue),
-        this.setCalculatedValue(displayValue, actions);
+        this.setCalculatedValue(displayValue);
         break;
       case operations.OPERATION_DIVIDE:
         displayValue = this.normalizeResult(parseFloat(this.attributes.val1) / parseFloat(this.attributes.val2));
-        actions = this.addResultToActions(displayValue),
-        this.setCalculatedValue(displayValue, actions);
+        this.setCalculatedValue(displayValue);
         break;
       case operations.OPERATION_SQRT:
         displayValue = this.normalizeResult(parseFloat(this.attributes.val1) ** (0.5));
-        actions = this.addResultToActions(displayValue),
-        this.setCalculatedValue(displayValue, actions);
+        this.setCalculatedValue(displayValue);
         break;
       case operations.OPERATION_PERCENT:
         displayValue = this.normalizeResult(parseFloat(this.attributes.val2) *  parseFloat(this.attributes.val1) / 100);
-        actions = this.addResultToActions(displayValue),
-        this.setCalculatedValue(displayValue, actions);
+        this.setCalculatedValue(displayValue);
         break;
     }
   },
 
   setOperation: function(operation, symbol) {
-    if (operation === operations.OPERATION_CHANGE_SIGN) {
-      this.changeSignOperation();
-      return;
-    }
-    if (operation === operations.OPERATION_MEMORY_ADD) {
-      this.addToMemory();
-      return;
-    }
-    if (operation === operations.OPERATION_UNDO) {
-      this.applyFromCache();
-      return;
-    }
-    if (operation === operations.OPERATION_MEMORY_SUBTRACT) {
-      this.subtractFromMemory();
-      return;
-    }
-    if (operation === operations.OPERATION_MEMORY_RECALL) {
-      this.recallFromMemory();
-      return;
-    }
-    if (operation === operations.OPERATION_SQRT) {
-      this.attributes.symbol = symbol;
-      if (this.attributes.operation) {
+    switch(operation ) {
+      case operations.OPERATION_CHANGE_SIGN:
+        this.changeSignOperation();
+        break;
+      case operations.OPERATION_MEMORY_ADD:
+        this.addToMemory();
+        break;
+      case operations.OPERATION_UND:
+        this.applyFromCache();
+        break;
+      case operations.OPERATION_MEMORY_SUBTRACT:
+        this.subtractFromMemory();
+        break;
+      case operations.OPERATION_MEMORY_RECALL:
+        this.recallFromMemory();
+        break;
+      case operations.OPERATION_SQRT:
+        this.attributes.symbol = symbol;
+        if (this.attributes.operation) {
+          this.calculateResult();
+          this.attributes.operation = operation;
+        } else {
+          this.attributes.operation = operation;
+          this.calculateResult();
+        }
+        break;
+      case operations.OPERATION_DOT:
+        this.addDotOperation();
+        break;
+      case operations.OPERATION_ERASE:
+        this.eraseOperation();
+        break;
+      case operations.OPERATION_EQUALS:
+        if(this.attributes.operation === '' || this.attributes.val2 === '') {
+          return;
+        }
         this.calculateResult();
-        this.attributes.operation = operation;
-      } else {
-        this.attributes.operation = operation;
-        this.calculateResult();
-      }
-      return;
-    }
-    if (operation === operations.OPERATION_DOT) {
-      this.addDotOperation();
-      return;
-    }
-    if (operation === operations.OPERATION_ERASE) {
-      this.eraseOperation();
-      return;
-    }
-    if (operation === operations.OPERATION_EQUALS) {
-      if(this.attributes.operation === '' || this.attributes.val2 === '') {
-        return;
-      }
-      this.calculateResult();
-      return;
-    } else {
-      this.attributes.symbol = symbol;
-      if (this.attributes.operation) {
-        this.calculateResult();
-        this.attributes.operation = operation;
-      } else {
-        this.attributes.operation = operation;
-      }
+        break;
+      default:
+        this.attributes.symbol = symbol;
+        if (this.attributes.operation) {
+          this.calculateResult();
+          this.attributes.operation = operation;
+        } else {
+          this.attributes.operation = operation;
+        }
     }
   },
   addToMemory: function() {
